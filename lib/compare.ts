@@ -321,17 +321,22 @@ const compareToPattern: TCompareToPattern = function (dataToCheck, pattern, opti
         return rearrangedMessage;
       }
 
-      const arr = rearrangedMessage.split('message key: ').filter(Boolean);
+      const arr: string[] = rearrangedMessage
+        .split('message key: ')
+        .map(i => i.trim())
+        .filter(Boolean);
 
       return arr
-        .reduce((acc, item, index) => {
+        .reduce((acc: string, item: string, index) => {
           // remove spaces for indexes
           const [indexFromItem] = item.match(indexPattern) || [''];
-          item = item.replace(` ${indexFromItem}`, indexFromItem).trim();
 
-          if (item.includes('Message:')) {
-            item = item.replace(/  /gim, ' ').replace('Message:', `${separator}Message:`);
-          }
+          item = item
+            .replace(
+              ` ${indexFromItem}`,
+              `${index === 0 && arr.length === 1 ? separator + indexFromItem : indexFromItem}`,
+            )
+            .trim();
 
           if (index === 0 && arr.length - 1 !== index) {
             acc += `${item.trim()}${separator}`;
@@ -345,6 +350,7 @@ const compareToPattern: TCompareToPattern = function (dataToCheck, pattern, opti
         }, '')
         .trim();
     }
+
     message =
       message.split(' message key: ').length > 2 &&
       message
@@ -362,7 +368,7 @@ const compareToPattern: TCompareToPattern = function (dataToCheck, pattern, opti
 
     message = message
       .replace(new RegExp(` ${separator}`, 'gmi'), separator)
-      .replace(new RegExp(` Message:`, 'gmi'), `${separator}Message:`);
+      .replace(new RegExp(`\\s+Message:`, 'gmi'), `${separator}Message:`);
   }
 
   return { result, message };

@@ -1,10 +1,22 @@
-/* eslint-disable unicorn/better-regex */
 const messageKeyRg = /message key: [\w\s]+\[\d+\]|message key: [\w\s]+/gim;
 const indexRg = /(\[\d\])$/gim;
 const indexGlobalRg = /(\[\d\])/gim;
 
 function rearrangeMessageKeys(notFormattedMessage: string) {
-  const matched: string[] = (notFormattedMessage.match(messageKeyRg) || []).reverse();
+  const messages = notFormattedMessage.split('Message:').filter(Boolean);
+  const sanitizedMessages = messages.filter(mPart => (mPart.match(indexGlobalRg) || ['']).join('') !== mPart);
+
+  if (messages.length === sanitizedMessages.length && sanitizedMessages.length !== 1) {
+    return messages
+      .map(message => rearrangeMessageKeys(`Message:${message}`))
+      .reverse()
+      .join(' ');
+  }
+
+  const matched = notFormattedMessage
+    .split('message key:')
+    .map(item => (item.includes('Message: ') ? item : `message key: ${item.trim()}`).trim())
+    .reverse();
 
   if (matched.length === 0) {
     return notFormattedMessage;
@@ -17,9 +29,10 @@ function rearrangeMessageKeys(notFormattedMessage: string) {
     notFormattedMessage = notFormattedMessage.replace(noIndexThere, '').replace(mathedIndex, '');
   });
 
-  matched.push(notFormattedMessage.trim());
-
   for (let i = 0; i < matched.length; i++) {
+    if (matched.length === 2) {
+      continue;
+    }
     if (i === matched.length - 2) {
       // next matched key
       const messageItem = matched[i + 1];

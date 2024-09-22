@@ -34,7 +34,7 @@ describe('compareToPattern', function () {
       deepStrictEqual(result, false, 'Should be same');
       deepStrictEqual(
         message,
-        't[1]->Message: expected: 1, actual: 2' + '\n' + 't[2]->Message: expected: 1, actual: 3',
+        't[2]->Message: expected: 1, actual: 3->t[1]->Message: expected: 1, actual: 2',
         'Message should be empty',
       );
     }
@@ -56,7 +56,7 @@ describe('compareToPattern', function () {
     }
   });
 
-  it.only('[N] compareToPattern every array item is a pattern', function () {
+  it('[N] compareToPattern every array item is a pattern', function () {
     {
       const data = { a: [2, 1, 3, 4] };
       const pattern = { a: 1 };
@@ -66,7 +66,7 @@ describe('compareToPattern', function () {
       deepStrictEqual(result, false, 'Should be same');
       deepStrictEqual(
         message,
-        'a->[0]Message: expected: 1, actual: 2[2]Message: expected: 1, actual: 3[3]Message: expected: 1, actual: 4',
+        'a->[0]Message: expected: 1, actual: 2 [2]Message: expected: 1, actual: 3 [3]Message: expected: 1, actual: 4',
         'Message should be empty',
       );
     }
@@ -526,12 +526,7 @@ describe('compareToPattern', function () {
       const { result, message } = compareToPattern(data, pattern, { dataIncludesMembers: true });
 
       const expectedComparisonMessage =
-        'Message: expected: 3, actual: 1\n' +
-        'Message: expected: 3, actual: 2\n' +
-        'Message: expected: 5, actual: 1\n' +
-        'Message: expected: 5, actual: 2\n' +
-        'Message: expected: 5, actual: 3\n' +
-        'Message: expected: 5, actual: 4\n' +
+        'Message: expected: 3, actual: 1->Message: expected: 3, actual: 2->Message: expected: 5, actual: 1->Message: expected: 5, actual: 2->Message: expected: 5, actual: 3->Message: expected: 5, actual: 4\n' +
         'field->a->Message: data does not include all pattern members';
       deepStrictEqual(result, false, 'Should be same');
       deepStrictEqual(message, expectedComparisonMessage, 'Message should be empty');
@@ -611,12 +606,7 @@ describe('compareToPattern', function () {
       const { result, message } = compareToPattern(data, pattern, { patternIncludesMembers: true });
       deepStrictEqual(result, false, 'Should be same');
       const expectedComparisonMessage =
-        '->Message: expected: 1, actual: 3\n' +
-        '->Message: expected: 2, actual: 3\n' +
-        '->Message: expected: 1, actual: 5\n' +
-        '->Message: expected: 2, actual: 5\n' +
-        '->Message: expected: 3, actual: 5\n' +
-        '->Message: expected: 4, actual: 5\n' +
+        'Message: expected: 1, actual: 3->Message: expected: 2, actual: 3->Message: expected: 1, actual: 5->Message: expected: 2, actual: 5->Message: expected: 3, actual: 5->Message: expected: 4, actual: 5\n' +
         'field->a->Message: pattern does not include all data members';
 
       deepStrictEqual(message, expectedComparisonMessage, 'Message should be empty');
@@ -1275,7 +1265,7 @@ describe('compareToPattern', function () {
     deepStrictEqual(result, false, 'Should be same');
     deepStrictEqual(
       message,
-      'c->Message: expected: 2, actual: 1 Message: expected: 2, actual: 1 Message: expected: 2, actual: 1 Message: data does not include all pattern members',
+      'c->Message: data does not include all pattern members->Message: expected: 2, actual: 1->Message: expected: 2, actual: 1->Message: expected: 2, actual: 1',
       'Message should be empty',
     );
   });
@@ -1307,7 +1297,7 @@ describe('compareToPattern', function () {
     deepStrictEqual(result, false, 'Should be same');
     deepStrictEqual(
       message,
-      'c->Message: expected: 2, actual: 5 Message: expected: 2, actual: 5 Message: pattern does not include all data members',
+      'c->Message: pattern does not include all data members->Message: expected: 2, actual: 5->Message: expected: 2, actual: 5',
       'Message should be empty',
     );
   });
@@ -1337,7 +1327,7 @@ describe('compareToPattern', function () {
 
     const { result, message } = compareToPattern(data, pattern);
     deepStrictEqual(result, false, 'Should not same');
-    deepStrictEqual(message, 'c[0]->Message: expected: 1, actual: 3', 'Message should be empty');
+    deepStrictEqual(message, 'c->[0]Message: expected: 1, actual: 3', 'Message should be empty');
   });
 
   it('[P] compareToPattern check compareArrays', function () {
