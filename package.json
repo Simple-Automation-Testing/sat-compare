@@ -1,12 +1,17 @@
 {
   "name": "sat-compare",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Universal comparison library",
-  "main": "built/index.js",
   "scripts": {
     "test": "mocha ./specs/**/*.spec.ts --require ts-node/register --timeout 30000",
     "lint": "eslint --ext .ts ./",
     "tsc": "rm -rf ./built && tsc"
+  },
+  "main": "./built/index.js",
+  "exports": {
+    ".": {
+      "require": "./built/index.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -43,6 +48,6 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "sat-utils": "^1.16.1"
+    "sat-utils": "1.16.1"
   }
 }
