@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "promise", "jsdoc", "jest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "warn",
+    "style": "warn",
+    "perf": "warn"
+  },
+  "rules": {
+    "eslint/complexity": "warn",
+    "jest/no-focused-tests": "error",
+
+    "eslint/max-depth": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-nested-callbacks": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/func-names": "off",
+    "eslint/func-style": "off",
+    "eslint/sort-keys": "off",
+    "eslint/sort-imports": "off",
+    "eslint/no-ternary": "off",
+    "eslint/yoda": "off",
+    "eslint/init-declarations": "off",
+    "eslint/no-continue": "off",
+    "eslint/no-inner-declarations": "off",
+    "eslint/no-else-return": "off",
+    "eslint/no-useless-concat": "off",
+    "eslint/eqeqeq": "off",
+
+    "unicorn/filename-case": "off",
+    "unicorn/no-null": "off",
+    "unicorn/explicit-length-check": "off",
+    "unicorn/prefer-string-replace-all": "off",
+
+    "jest/prefer-lowercase-title": "off",
+    "jest/no-identical-title": "off",
+    "jest/expect-expect": "off",
+
+    "typescript/consistent-type-definitions": "off"
+  },
+  "ignorePatterns": ["built/**", "node_modules/**"]
+}

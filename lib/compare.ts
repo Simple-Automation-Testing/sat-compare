@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity, unicorn/prefer-string-replace-all */
 import {
   isNull,
   isArray,
@@ -129,17 +128,17 @@ const compare: Tcompare = function (dataToCheck, pattern, options?: TCompareOpts
         !patternIncludesMembers &&
         !checkLengthIfRequired(patternArray.length, dataArray.length)
       ) {
-        message += `Message: expected length: ${patternArray.length}, actual lenght: ${dataArray.length}`;
+        message += `Message: expected length: ${patternArray.length}, actual length: ${dataArray.length}`;
         return false;
       }
 
-      if (dataIncludesMembers && dataArray.lenght < patternArray.lenght) {
-        message += `Message: data can not include all pattern member because of expected length: ${patternArray.length}, actual lenght: ${dataArray.length}`;
+      if (dataIncludesMembers && dataArray.length < patternArray.length) {
+        message += `Message: data can not include all pattern member because of expected length: ${patternArray.length}, actual length: ${dataArray.length}`;
         return false;
       }
 
-      if (patternIncludesMembers && dataArray.lenght > patternArray.lenght) {
-        message += `Message: pattern can not include all pattern member because of expected length: ${patternArray.length}, actual lenght: ${dataArray.length}`;
+      if (patternIncludesMembers && dataArray.length > patternArray.length) {
+        message += `Message: pattern can not include all pattern member because of expected length: ${patternArray.length}, actual length: ${dataArray.length}`;
         return false;
       }
 
@@ -287,7 +286,7 @@ const compare: Tcompare = function (dataToCheck, pattern, options?: TCompareOpts
 
         return everyArrayItem ? result.length === dataWithoutIndexesThatShouldBeIgnored.length : Boolean(result.length);
       } else {
-        message += `Message: expected length: ${lengthToCheck}, actual lenght: ${data.length}`;
+        message += `Message: expected length: ${lengthToCheck}, actual length: ${data.length}`;
         return false;
       }
     }
@@ -327,44 +326,25 @@ const compare: Tcompare = function (dataToCheck, pattern, options?: TCompareOpts
         .filter(Boolean);
 
       return arr
-        .reduce((acc: string, item: string, index) => {
-          // remove spaces for indexes
+        .map((item, index) => {
           const [indexFromItem] = item.match(indexPattern) || [''];
+          const prefix = index === 0 && arr.length === 1 ? separator + indexFromItem : indexFromItem;
 
-          item = item
-            .replace(
-              ` ${indexFromItem}`,
-              `${index === 0 && arr.length === 1 ? separator + indexFromItem : indexFromItem}`,
-            )
-            .trim();
-
-          if (index === 0 && arr.length - 1 !== index) {
-            acc += `${item.trim()}${separator}`;
-          } else if (arr.length - 1 === index) {
-            acc += `${item.trim()}`;
-          } else {
-            acc += `${item.trim()}${separator}`;
-          }
-
-          return acc;
-        }, '')
+          return item.replace(` ${indexFromItem}`, prefix).trim();
+        })
+        .join(separator)
         .trim();
     }
 
-    message =
-      message.split(' message key: ').length > 2 &&
-      message
-        .split('Message:')
-        .map(m => m.trim())
-        .filter(m => !indexPattern.test(m))
-        .filter(Boolean).length > 1
-        ? message
-            .split('Message:')
-            .map(m => m.trim())
-            .filter(Boolean)
-            .map(m => createMessage(`Message: ${m}`))
-            .join('\n')
-        : createMessage(message);
+    const hasMultipleKeys = message.split(' message key: ').length > 2;
+    const messageParts = message.split('Message:').map(m => m.trim()).filter(Boolean);
+    const hasMultipleMessages = messageParts.filter(m => !indexPattern.test(m)).length > 1;
+
+    if (hasMultipleKeys && hasMultipleMessages) {
+      message = messageParts.map(m => createMessage(`Message: ${m}`)).join('\n');
+    } else {
+      message = createMessage(message);
+    }
 
     message = message
       .replace(new RegExp(` ${separator}`, 'gmi'), separator)

@@ -1,4 +1,3 @@
-const messageKeyRg = /message key: [\w\s]+\[\d+\]|message key: [\w\s]+/gim;
 const indexRg = /(\[\d\])$/gim;
 const indexGlobalRg = /(\[\d\])/gim;
 

@@ -490,7 +490,7 @@ describe('compare', function () {
       };
       const { result, message } = compare(data, pattern);
       deepStrictEqual(result, false, 'Should be same');
-      deepStrictEqual(message, 'field->a->Message: expected length: 1, actual lenght: 0', 'Message should be empty');
+      deepStrictEqual(message, 'field->a->Message: expected length: 1, actual length: 0', 'Message should be empty');
     }
     {
       const pattern = {
@@ -501,7 +501,7 @@ describe('compare', function () {
       };
       const { result, message } = compare(data, pattern);
       deepStrictEqual(result, false, 'Should be same');
-      deepStrictEqual(message, 'field->a->Message: expected length: 0, actual lenght: 1', 'Message should be empty');
+      deepStrictEqual(message, 'field->a->Message: expected length: 0, actual length: 1', 'Message should be empty');
     }
   });
 
@@ -568,7 +568,7 @@ describe('compare', function () {
       deepStrictEqual(result, false, 'Should be same');
       deepStrictEqual(
         message,
-        'field->a->Message: data does not include all pattern members',
+        'field->a->Message: data can not include all pattern member because of expected length: 4, actual length: 0',
         'Message should be empty',
       );
     }
@@ -648,7 +648,7 @@ describe('compare', function () {
       deepStrictEqual(result, false, 'Should be same');
       deepStrictEqual(
         message,
-        'field->a->Message: pattern does not include all data members',
+        'field->a->Message: pattern can not include all pattern member because of expected length: 0, actual length: 4',
         'Message should be empty',
       );
     }
@@ -995,7 +995,7 @@ describe('compare', function () {
       const data = { field: [] };
       const { result, message } = compare(data, pattern, { allowEmptyArray: false });
       deepStrictEqual(result, false, 'Should be same');
-      deepStrictEqual(message, 'field->Message: expected length: >0, actual lenght: 0', 'Message should not be empty');
+      deepStrictEqual(message, 'field->Message: expected length: >0, actual length: 0', 'Message should not be empty');
     }
     {
       const pattern = {
@@ -1197,7 +1197,7 @@ describe('compare', function () {
       deepStrictEqual(message, '', 'Message should be empty');
     }
     {
-      const data = {
+      const _data = {
         topItem: {
           arrayItem: [
             {
@@ -1224,7 +1224,7 @@ describe('compare', function () {
         },
       };
 
-      const pattern = {
+      const _pattern = {
         topItem: {
           arrayItem: {
             item1: true,
@@ -1408,6 +1408,290 @@ describe('compare', function () {
 
     const { result, message } = compare(data, pattern, { ignoreProperties: ['test'] });
     deepStrictEqual(result, true, `Should be same ${message}`);
+  });
+
+  it('[N] compare dataIncludesMembers data shorter than pattern', function () {
+    {
+      const pattern = {
+        field: { a: [1, 2, 3] },
+      };
+      const data = {
+        field: { a: [1] },
+      };
+      const { result, message } = compare(data, pattern, { dataIncludesMembers: true });
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'field->a->Message: data can not include all pattern member because of expected length: 3, actual length: 1',
+        'Message should be empty',
+      );
+    }
+    {
+      const pattern = {
+        field: { a: [1, 2] },
+      };
+      const data = {
+        field: { a: [1] },
+      };
+      const { result, message } = compare(data, pattern, { dataIncludesMembers: true });
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'field->a->Message: data can not include all pattern member because of expected length: 2, actual length: 1',
+        'Message should be empty',
+      );
+    }
+  });
+
+  it('[N] compare patternIncludesMembers data longer than pattern', function () {
+    {
+      const pattern = {
+        field: { a: [1] },
+      };
+      const data = {
+        field: { a: [1, 2, 3] },
+      };
+      const { result, message } = compare(data, pattern, { patternIncludesMembers: true });
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'field->a->Message: pattern can not include all pattern member because of expected length: 1, actual length: 3',
+        'Message should be empty',
+      );
+    }
+    {
+      const pattern = {
+        field: { a: [1] },
+      };
+      const data = {
+        field: { a: [1, 2] },
+      };
+      const { result, message } = compare(data, pattern, { patternIncludesMembers: true });
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'field->a->Message: pattern can not include all pattern member because of expected length: 1, actual length: 2',
+        'Message should be empty',
+      );
+    }
+  });
+
+  it('[N] compare array length mismatch message format', function () {
+    {
+      const pattern = {
+        field: { a: [1, 2, 3] },
+      };
+      const data = {
+        field: { a: [1] },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'field->a->Message: expected length: 3, actual length: 1',
+        'Message should be empty',
+      );
+    }
+    {
+      const pattern = {
+        field: { a: [1] },
+      };
+      const data = {
+        field: { a: [1, 2, 3] },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'field->a->Message: expected length: 1, actual length: 3',
+        'Message should be empty',
+      );
+    }
+  });
+
+  it('[N] compare allowEmptyArray false message format', function () {
+    {
+      const pattern = { field: { a: 1 } };
+      const data = { field: [] };
+      const { result, message } = compare(data, pattern, { allowEmptyArray: false });
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(message, 'field->Message: expected length: >0, actual length: 0', 'Message should not be empty');
+    }
+    {
+      const pattern = { items: { x: 'test' } };
+      const data = { items: [] };
+      const { result, message } = compare(data, pattern, { allowEmptyArray: false });
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'items->Message: expected length: >0, actual length: 0',
+        'Message should not be empty',
+      );
+    }
+  });
+
+  it('[N] compare nested error message formatting', function () {
+    {
+      const pattern = {
+        a: { b: { c: 'expected' } },
+      };
+      const data = {
+        a: { b: { c: 'actual' } },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'a->b->c->Message: expected: expected, actual: actual',
+        'Message should contain nested path',
+      );
+    }
+    {
+      const pattern = {
+        a: { b: [{ c: 'expected' }] },
+      };
+      const data = {
+        a: { b: [{ c: 'actual' }] },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should be same');
+      deepStrictEqual(
+        message,
+        'a->b[0]->c->Message: expected: expected, actual: actual',
+        'Message should contain nested path with index',
+      );
+    }
+  });
+
+  it('[N] compare deeply nested object->array->object->array error message', function () {
+    {
+      const pattern = {
+        root: {
+          groups: {
+            name: 'g1',
+            entries: [{ value: 'a' }, { value: 'b' }, { value: 'c' }],
+          },
+        },
+      };
+      const data = {
+        root: {
+          groups: [
+            {
+              name: 'g1',
+              entries: [{ value: 'a' }, { value: 'b' }, { value: 'WRONG' }],
+            },
+          ],
+        },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should not be same');
+      deepStrictEqual(
+        message,
+        'root->groups[0]->entries [2]->value->Message: expected: c, actual: WRONG',
+        'Message should show full nested path',
+      );
+    }
+    {
+      const pattern = {
+        root: {
+          groups: [
+            {
+              name: 'g1',
+              entries: [{ value: 'a' }, { value: 'b' }],
+            },
+            {
+              name: 'g2',
+              entries: [{ value: 'x' }, { value: 'y' }],
+            },
+          ],
+        },
+      };
+      const data = {
+        root: {
+          groups: [
+            {
+              name: 'g1',
+              entries: [{ value: 'a' }, { value: 'b' }],
+            },
+            {
+              name: 'g2',
+              entries: [{ value: 'x' }, { value: 'WRONG' }],
+            },
+          ],
+        },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should not be same');
+      deepStrictEqual(
+        message,
+        'root->groups[1]->entries [1]->value->Message: expected: y, actual: WRONG',
+        'Message should show path through second array item',
+      );
+    }
+    {
+      const pattern = {
+        root: {
+          groups: {
+            name: 'g1',
+            entries: [{ value: 'a' }, { value: 'b' }, { value: 'c' }],
+          },
+        },
+      };
+      const data = {
+        root: {
+          groups: [
+            {
+              name: 'g1',
+              entries: [{ value: 'a' }],
+            },
+          ],
+        },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should not be same');
+      deepStrictEqual(
+        message,
+        'root->groups[0]->entries->Message: expected length: 3, actual length: 1',
+        'Message should show length mismatch in inner array',
+      );
+    }
+    {
+      const pattern = {
+        root: {
+          groups: [
+            {
+              name: 'g1',
+              entries: [{ value: 'a' }, { value: 'b' }],
+            },
+            {
+              name: 'g2',
+              entries: [{ value: 'x' }, { value: 'y' }],
+            },
+          ],
+        },
+      };
+      const data = {
+        root: {
+          groups: [
+            {
+              name: 'g1',
+              entries: [{ value: 'WRONG' }, { value: 'b' }],
+            },
+            {
+              name: 'g2',
+              entries: [{ value: 'x' }, { value: 'WRONG2' }],
+            },
+          ],
+        },
+      };
+      const { result, message } = compare(data, pattern);
+      deepStrictEqual(result, false, 'Should not be same');
+      deepStrictEqual(
+        message,
+        'root->groups[0]->entries [0]->value->Message: expected: a, actual: WRONG',
+        'Message should show first encountered mismatch',
+      );
+    }
   });
 
   it('[N] compare missed fields', function () {
